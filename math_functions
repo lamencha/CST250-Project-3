@@ -1,0 +1,40 @@
+#Description: Multiplies/adds/subtracts $v0 and $s6, stores in $v0
+#Resources: $v0 = total, $s6 = new number
+multiply:
+	beq $s5, $0, multiply_not_negative	#sign bit is 0
+		nop
+		#if current number ($s6) was negative, get 2's compliment
+		jal unsigned_to_negative
+		nop
+	multiply_not_negative:
+		jal multiplication_overflow_check
+		nop
+		mullo $v0, $v0, $s6
+		li $t0, 4
+		beq $s7, $t0, print
+		nop
+		j reset_program
+		nop
+add:
+	beq $s5, $0, add_not_negative	#sign bit is 0
+		nop
+		#if current number ($s6) was negative, get 2's compliment
+		jal unsigned_to_negative
+		nop
+	add_not_negative:
+		jal set_overflow_flag
+		nop
+		addu $v0, $v0, $s6
+		jal check_overflow_flag
+		nop
+		li $t0, 4
+		beq $s7, $t0, print
+		nop
+		j reset_program
+		nop
+
+subtract:
+	jal unsigned_to_negative
+	nop
+	j add
+	nop

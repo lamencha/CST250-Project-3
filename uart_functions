@@ -1,0 +1,212 @@
+#Description: Reads UART and returns it in $t1
+#Resources: $s0 = UART, $s2 = 2, $t0 = temp
+get_char:
+	lw $t0, 4($s0)	#load status register
+	and $t0, $t0, $s2	#mask for ready bit
+	bne $t0, $s2, no_equals_operator
+	nop
+	lw $t1, 8($s0)	#load from recieve buffer
+	sw $s2, 0($s0)	#command register: clear status
+	jr $ra
+	nop
+
+get_first_char:
+	lw $t0, 4($s0)	#load status register
+	and $t0, $t0, $s2	#mask for ready bit
+	bne $t0, $s2, get_first_char
+	nop
+	lw $t1, 8($s0)	#load from recieve buffer
+	sw $s2, 0($s0)	#command register: clear status
+	jr $ra
+	nop
+
+#Description: Writes $t1 to UART
+#Resources: $s0 = UART, $s1 = 1, $t0 = temp
+put_char:
+	lw $t0, 4($s0)	#load status register
+	and $t0, $t0, $s1	#mask for clear to send
+	bne $t0, $s1, put_char
+	nop
+	sw $t1, 12($s0)	#store in send buffer
+	sw $s1, 0($s0)	#command register: send
+	jr $ra
+	nop
+#Description: Prints out the value in $v0
+#Resources: $v0 = value to print
+print:
+	li $t1, 0
+	slt $t0, $v0, $0
+	beq $t0, $0, size_check
+	nop
+	jal negative_to_postive
+	nop
+	li $t1, '-'
+	jal put_char
+	nop
+	li $t1, 0
+	j size_check
+	nop
+
+	billions:
+	li $t0, 1000000000
+	slt $t0, $v0, $t0
+	bne $t0, $0, billions_done
+	nop
+	li $t0, 1000000000
+	subu $v0, $v0, $t0
+	addiu $t1, $t1, 1
+	j billions
+	nop
+		billions_done:
+		addiu $t1, $t1, 48
+		jal put_char
+		nop
+		li $t1, 0
+
+	hundred_millions:
+	li $t0, 100000000
+	slt $t0, $v0, $t0
+	bne $t0, $0, hundred_millions_done
+	nop
+	li $t0, 100000000
+	subu $v0, $v0, $t0
+	addiu $t1, $t1, 1
+	j hundred_millions
+	nop
+		hundred_millions_done:
+		addiu $t1, $t1, 48
+		jal put_char
+		nop
+		li $t1, 0
+
+	ten_millions:
+	li $t0, 10000000
+	slt $t0, $v0, $t0
+	bne $t0, $0, ten_millions_done
+	nop
+	li $t0, 10000000
+	subu $v0, $v0, $t0
+	addiu $t1, $t1, 1
+	j ten_millions
+	nop
+		ten_millions_done:
+		addiu $t1, $t1, 48
+		jal put_char
+		nop
+		li $t1, 0
+
+	millions:
+	li $t0, 1000000
+	slt $t0, $v0, $t0
+	bne $t0, $0, millions_done
+	nop
+	li $t0, 1000000
+	subu $v0, $v0, $t0
+	addiu $t1, $t1, 1
+	j millions
+	nop
+		millions_done:
+		addiu $t1, $t1, 48
+		jal put_char
+		nop
+		li $t1, 0
+
+	hundred_thousands:
+	li $t0, 100000
+	slt $t0, $v0, $t0
+	bne $t0, $0, hundred_thousands_done
+	nop
+	li $t0, 100000
+	subu $v0, $v0, $t0
+	addiu $t1, $t1, 1
+	j hundred_thousands
+	nop
+		hundred_thousands_done:
+		addiu $t1, $t1, 48
+		jal put_char
+		nop
+		li $t1, 0
+
+	ten_thousands:
+	slti $t0, $v0, 10000
+	bne $t0, $0, ten_thousands_done
+	nop
+	li $t0, 10000
+	subu $v0, $v0, $t0
+	addiu $t1, $t1, 1
+	j ten_thousands
+	nop
+		ten_thousands_done:
+		addiu $t1, $t1, 48
+		jal put_char
+		nop
+		li $t1, 0
+
+	thousands:
+	slti $t0, $v0, 1000
+	bne $t0, $0, thousands_done
+	nop
+	li $t0, 1000
+	subu $v0, $v0, $t0
+	addiu $t1, $t1, 1
+	j thousands
+	nop
+		thousands_done:
+		addiu $t1, $t1, 48
+		jal put_char
+		nop
+		li $t1, 0
+
+	hundreds:
+	slti $t0, $v0, 100
+	bne $t0, $0, hundreds_done
+	nop
+	li $t0, 100
+	subu $v0, $v0, $t0
+	addiu $t1, $t1, 1
+	j hundreds
+	nop
+		hundreds_done:
+		addiu $t1, $t1, 48
+		jal put_char
+		nop
+		li $t1, 0
+
+	tens:
+	slti $t0, $v0, 10
+	bne $t0, $0, tens_done
+	nop
+	li $t0, 10
+	subu $v0, $v0, $t0
+	addiu $t1, $t1, 1
+	j tens
+	nop
+		tens_done:
+		addiu $t1, $t1, 48
+		jal put_char
+		nop
+		li $t1, 0
+
+	ones:
+	slti $t0, $v0, 1
+	bne $t0, $0, ones_done
+	nop
+	li $t0, 1
+	subu $v0, $v0, $t0
+	addiu $t1, $t1, 1
+	j ones
+	nop
+		ones_done:
+		addiu $t1, $t1, 48
+		jal put_char
+		nop
+		li $t1, 0
+
+	print_done:
+	li $t1, 0xA
+	jal put_char #print next line.
+	nop
+	li $s7, 0
+	li $v0, 0
+	j really_reset_program
+	nop

@@ -1,0 +1,52 @@
+multiplication_overflow_check:
+	mulhi $t9, $v0, $s6
+	li $t8, -1
+	beq $t9, $t8, just_negative
+	nop
+	bne $t9, $0, input_overflow	#result has caused an overflow
+	nop
+	just_negative:
+	jr $ra
+	nop
+
+set_overflow_flag:
+	li $a0, 2
+
+
+	slt $t0, $v0, $0 #$t0 will be 1 if $v0 is negative
+	bne $t0, $0, v_is_negative
+	nop
+	j v_is_positive
+	nop
+
+	v_is_negative:
+		slt $t0, $s6, $0 #$t0 will be 1 if $s6 is negative
+		beq $t0, $0, end_of_set_overflow_flag
+		nop
+		li $a0, 0
+		j end_of_set_overflow_flag
+		nop
+	
+	v_is_positive:
+		slt $t0, $s6, $0 #$t0 will be 1 if $s6 is negative
+		bne $t0, $0, end_of_set_overflow_flag
+		nop
+		li $a0, 1
+
+	end_of_set_overflow_flag:
+		jr $ra
+		nop
+
+
+check_overflow_flag:
+	li $t0, 2
+	beq $a0, $t0 no_overflow
+	nop
+	slt $t0, $v0, $0 #$t0 will be 1 if $v0 is negative
+	bne $t0, $a0 no_overflow
+	nop
+	j input_overflow
+	nop
+	no_overflow:
+		jr $ra
+		nop

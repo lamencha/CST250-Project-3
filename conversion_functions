@@ -1,0 +1,31 @@
+#Description: convert's unsigned binary in current number to it's negative 2's complement
+#Resources: $s6 = current number, $s1 = 1
+unsigned_to_negative:
+	nor $s6, $s6, $s6	#NOT result
+	addu $s6, $s6, $s1	#add 1 to result
+	jr $ra
+	nop
+
+#Description: current number = (current number * 10) + x
+#Resources: $t0 = temp
+string_to_value:
+	mulhi $t9, $s6, $s3
+	bne $t9, $0, input_overflow	#result has caused an overflow
+	nop
+	mullo $s6, $s6, $s3	#multiply current result by 10
+	srl $t9, $s6, 31 	#get sign bit
+	beq $s1, $t9, input_overflow	#sign bit has been set, invalid_input
+	nop
+	subu $t1, $t1, $s4	#convert x from ascii to decimal
+	addu $s6, $s6, $t1	#current number + x
+	srl $t9, $s6, 31 	#get sign bit
+	beq $s1, $t9, input_overflow	#sign bit has been set, invalid_input
+	nop
+	jr $ra
+	nop
+
+negative_to_postive:
+	nor $v0, $v0, $v0	#NOT result
+	addu $v0, $v0, $s1	#add 1 to result
+	jr $ra
+	nop

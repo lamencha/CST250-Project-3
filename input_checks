@@ -1,0 +1,162 @@
+#Description: checks what opperator was entered
+is_operator:
+	#check if operator is character is '='
+	li $t2, 61
+	beq $t1, $t2, is_equals
+	nop
+	li $t0, '*'
+	beq $t0, $t1, mult_operator
+	nop
+	li $t0, '+'
+	beq $t0, $t1, add_operator
+	nop
+	li $t0, '-'
+	beq $t0, $t1, sub_operator
+	nop
+	#character is not an operator, return
+	li $a1, 0
+	jr $ra
+	nop
+
+
+#-----------------------------------------------------------------------------------------
+mult_operator:
+	move $t7, $s7
+	li $s7, 2
+	li $t0, 0
+	beq $t7, $t0, add
+	nop
+	li $t0, 1
+	beq $t7, $t0, subtract
+	nop
+	li $t0, 2
+	beq $t7, $t0, multiply
+	nop
+add_operator:
+	move $t7, $s7
+	li $s7, 0
+	li $t0, 0
+	beq $t7, $t0, add
+	nop
+	li $t0, 1
+	beq $t7, $t0, subtract
+	nop
+	li $t0, 2
+	beq $t7, $t0, multiply
+	nop
+sub_operator:
+	move $t7, $s7
+	li $s7, 1
+	li $t0, 0
+	beq $t7, $t0, add
+	nop
+	li $t0, 1
+	beq $t7, $t0, subtract
+	nop
+	li $t0, 2
+	beq $t7, $t0, multiply
+	nop
+
+#-----------------------------------------------------------------------------------------
+#Description: Calls compute_result and then calls display_result
+is_equals:
+	move $t7, $s7
+	li $s7, 4
+	li $t0, 0
+	beq $t7, $t0, add
+	nop
+	li $t0, 1
+	beq $t7, $t0, subtract
+	nop
+	li $t0, 2
+	beq $t7, $t0, multiply
+	nop
+
+	j reset_program
+	nop
+
+
+#Description: Checks if $t1 is ascii decimal number
+#Resources: $t0 = temp
+is_number:
+	li $t0, 0x30	#ascii 0
+	beq $t0, $t1, valid_input
+	nop
+	addiu $t0, $t0, 1	#acscii 1
+	beq $t0, $t1, valid_input
+	nop
+	addiu $t0, $t0, 1	#acscii 2
+	beq $t0, $t1, valid_input
+	nop
+	addiu $t0, $t0, 1	#acscii 3
+	beq $t0, $t1, valid_input
+	nop
+	addiu $t0, $t0, 1	#acscii 4
+	beq $t0, $t1, valid_input
+	nop
+	addiu $t0, $t0, 1	#acscii 5
+	beq $t0, $t1, valid_input
+	nop
+	addiu $t0, $t0, 1	#acscii 6
+	beq $t0, $t1, valid_input
+	nop
+	addiu $t0, $t0, 1	#acscii 7
+	beq $t0, $t1, valid_input
+	nop
+	addiu $t0, $t0, 1	#acscii 8
+	beq $t0, $t1, valid_input
+	nop
+	addiu $t0, $t0, 1	#acscii 9
+	beq $t0, $t1, valid_input
+	nop
+	j invalid_input
+	nop
+
+valid_input:
+	push $ra
+	jal string_to_value
+	nop
+	pop $ra
+	jr $ra
+	nop
+
+size_check:
+	li $t0, 1000000000
+	slt $t0, $v0, $t0
+	beq $t0, $0, billions
+	nop
+	li $t0, 100000000
+	slt $t0, $v0, $t0
+	beq $t0, $0, hundred_millions
+	nop
+	li $t0, 10000000
+	slt $t0, $v0, $t0
+	beq $t0, $0, ten_millions
+	nop
+	li $t0, 1000000
+	slt $t0, $v0, $t0
+	beq $t0, $0, millions
+	nop
+	li $t0, 100000
+	slt $t0, $v0, $t0
+	beq $t0, $0, hundred_thousands
+	nop
+	li $t0, 10000
+	slt $t0, $v0, $t0
+	beq $t0, $0, ten_thousands
+	nop
+	li $t0, 1000
+	slt $t0, $v0, $t0
+	beq $t0, $0, thousands
+	nop
+	li $t0, 100
+	slt $t0, $v0, $t0
+	beq $t0, $0, hundreds
+	nop
+	li $t0, 10
+	slt $t0, $v0, $t0
+	beq $t0, $0, tens
+	nop
+	j ones
+	nop
+	

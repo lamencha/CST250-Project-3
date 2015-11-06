@@ -1,0 +1,44 @@
+#Description: Handles incorrect or unexpected input
+#Resources: $t0 = temp
+invalid_input:
+li $t1, 'E'	#E
+jal put_char
+nop
+li $t1, '1'	#1
+jal put_char
+nop
+li $t1, 0xA	#new line
+jal put_char
+nop
+move $v0, $0
+j reset_error
+nop
+
+#if input is too large
+input_overflow: 
+li $t1, 'E'	#E
+jal put_char
+nop
+li $t1, '2'	#2
+jal put_char
+nop
+li $t1, 0xA	#new line
+jal put_char
+nop
+move $v0, $0
+j reset_error
+nop
+
+no_equals_operator:
+li $t1, 'E'	#E
+jal put_char
+nop
+li $t1, '3'	#3
+jal put_char
+nop
+li $t1, 0xA	#new line
+jal put_char
+nop
+move $v0, $0
+j reset_error
+nop

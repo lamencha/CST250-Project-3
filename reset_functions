@@ -1,0 +1,33 @@
+#clear all characters of a previous expression before reseting
+reset_error:
+#li $t2, 4 #current operator is '='
+#beq $a1, $t2, really_reset_program
+#nop
+lw $t0, 4($s0)	#load status register
+and $t0, $t0, $s2	#mask for ready bit
+bne $t0, $s2, really_reset_program
+nop
+not_end_of_expression:
+jal get_char
+nop
+lw $t0, 4($s0)	#load status register
+and $t0, $t0, $s2	#mask for ready bit
+beq $t0, $s2, not_end_of_expression
+nop
+#bne $t1, $t2, not_end_of_expression
+#nop
+
+really_reset_program:
+li $s5, 0 #sign bit
+li $s6, 0	#current number	
+li $s7, 0 #operator flag
+j read_initial_char
+nop
+
+#Description: clears all "Calculator Values"
+reset_program:
+li $s5, 0 #sign bit
+li $s6, 0	#current number	
+j read_first_char
+nop
+

@@ -1,0 +1,57 @@
+.org 0x10000000
+
+#INITIALIZATIONS
+#Stack Pointer   
+li $sp, 0x10fffffc
+
+#UART Functions
+li $s0, 0xF0000000	#UART
+li $s1, 0x1	#mask for bit 0, used by put_char
+li $s2, 0x2	#mask for bit 1, used by get_char
+li $t1, 0		#x: used for UART character reads and writes
+
+#Conversion Constants
+li $s3, 10		#used by decimal_to_binary
+li $s4, 48		#subtract from ascii for decimal
+
+#Calculator Values
+li $s5, 0 	#sign bit
+li $s6, 0	#current number
+li $v0, 0 #total number
+li $s7, 0 #operator flag: +0, -1, *2, =4
+
+###MAIN LOOP-----------------------------------------------------
+read_initial_char:
+	jal get_first_char
+	nop
+	# if first char is '-', set sign bit ($s5) to 1
+	li $t0, 45
+	bne $t0, $t1, no_negative_sign
+		nop
+		li $s5, 1	# set sign bit to 1
+		j get_num	# first character is negative sign, get next char
+		nop
+
+read_first_char:
+	jal get_char
+	nop
+	# if first char is '-', set sign bit ($s5) to 1
+	li $t0, 45
+	bne $t0, $t1, no_negative_sign
+		nop
+		li $s5, 1	# set sign bit to 1
+		j get_num	# first character is negative sign, get next char
+		nop
+	no_negative_sign:
+	jal is_number
+	nop
+
+get_num:
+	jal get_char
+	nop
+	jal is_operator
+	nop
+	jal is_number
+	nop
+	j get_num
+	nop
